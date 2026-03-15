@@ -89,6 +89,7 @@ def run() -> None:
     source = AdzunaSource(
         country=adzuna_cfg.get("country", "us"),
         results_per_page=adzuna_cfg.get("results_per_page", 50),
+        max_days_old=adzuna_cfg.get("max_days_old", 1),
     )
 
     scorer = Scorer(resume=resume, preferences=preferences)

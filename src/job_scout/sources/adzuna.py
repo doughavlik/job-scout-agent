@@ -16,11 +16,12 @@ ADZUNA_BASE = "https://api.adzuna.com/v1/api/jobs"
 
 
 class AdzunaSource(JobSource):
-    def __init__(self, country: str = "us", results_per_page: int = 50):
+    def __init__(self, country: str = "us", results_per_page: int = 50, max_days_old: int = 1):
         self.app_id = os.environ["ADZUNA_APP_ID"]
         self.app_key = os.environ["ADZUNA_APP_KEY"]
         self.country = country
         self.results_per_page = results_per_page
+        self.max_days_old = max_days_old
 
     @property
     def name(self) -> str:
@@ -38,6 +39,8 @@ class AdzunaSource(JobSource):
             params["where"] = search.location
         if search.radius_km is not None:
             params["distance"] = search.radius_km
+        if self.max_days_old is not None:
+            params["max_days_old"] = self.max_days_old
 
         url = f"{ADZUNA_BASE}/{self.country}/search/1"
         logger.info("Adzuna query: %s params=%s", url, {k: v for k, v in params.items() if k not in ("app_id", "app_key")})

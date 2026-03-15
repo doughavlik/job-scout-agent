@@ -1,0 +1,34 @@
+# Job Scout configuration
+# Secrets (API keys, passwords) are read from environment variables, not this file.
+
+user:
+  email: "your-email@gmail.com"          # Where notifications are sent
+  notification_threshold: 70             # Minimum score (1-100) to trigger email
+  resume_path: "master_resume.md"
+  preferences_path: "preferences.md"
+
+searches:
+  - name: "Customer Success Manager - Remote"
+    keywords: "customer success manager"
+    location: "United States"
+    remote: "remote"                     # onsite | hybrid | remote
+    radius_km: null                      # null for remote jobs
+    excluded_companies:
+      - "Scam Corp"
+    excluded_title_keywords:
+      - "intern"
+      - "director"
+      - "vp"
+
+  - name: "Customer Success - Hybrid NYC"
+    keywords: "customer success"
+    location: "New York"
+    remote: "hybrid"
+    radius_km: 50
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+
+adzuna:
+  country: "us"                          # Adzuna country code
+  results_per_page: 50

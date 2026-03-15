@@ -14,7 +14,7 @@ Manually checking job boards multiple times daily is tedious and leads to missed
 **Language:** Python 3.11+
 **Database:** Supabase (PostgreSQL) — stores seen jobs, scores, user config, and search criteria.
 **LLM:** Google Gemini Flash via API — scores job-to-candidate fit.
-**Email:** Gmail API (OAuth2) — sends notifications when jobs exceed the user's score threshold.
+**Email:** Gmail SMTP with App Password — sends notifications when jobs exceed the user's score threshold. (Simpler than OAuth2 for a GitHub Actions bot; requires 2FA enabled on the Google account and an app-specific password.)
 **Job Sources:** Adzuna API (free tier: 250 req/day). Design a `JobSource` abstract base class so additional sources (JSearch, The Muse, etc.) can be added as plugins.
 
 ## Core Workflow
@@ -34,7 +34,7 @@ Manually checking job boards multiple times daily is tedious and leads to missed
 
 ## Configuration
 
-All secrets (API keys, Supabase URL, Gmail OAuth tokens) are stored as GitHub Actions encrypted secrets. User-facing config (search criteria, threshold, preferences doc) lives in a `config.yaml` checked into the repo, with sensitive fields referencing environment variables.
+All secrets (API keys, Supabase URL, Gmail App Password) are stored as GitHub Actions encrypted secrets. User-facing config (search criteria, threshold, preferences doc) lives in a `config.yaml` checked into the repo, with sensitive fields referencing environment variables.
 
 ## Multi-User Considerations
 

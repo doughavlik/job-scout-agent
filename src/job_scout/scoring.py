@@ -8,7 +8,7 @@ import os
 import re
 from datetime import datetime, timezone
 
-import google.generativeai as genai
+from google import genai
 
 from .models import Job, ScoredJob
 
@@ -56,8 +56,7 @@ def _format_salary(job: Job) -> str:
 
 class Scorer:
     def __init__(self, resume: str, preferences: str):
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.model = genai.GenerativeModel(MODEL_NAME)
+        self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
         self.resume = resume
         self.preferences = preferences
 
@@ -74,7 +73,10 @@ class Scorer:
         )
 
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=MODEL_NAME,
+                contents=prompt,
+            )
             text = response.text.strip()
             # Strip markdown code fences if present
             text = re.sub(r"^```(?:json)?\s*", "", text)

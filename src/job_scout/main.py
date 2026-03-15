@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -22,7 +23,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def load_config(path: str = "config.yaml") -> dict:
+def load_config(path: str | None = None) -> dict:
+    if path is None:
+        # Look for config.yaml in the repo root (parent of src/)
+        candidates = [
+            Path("config.yaml"),
+            Path(__file__).resolve().parent.parent.parent / "config.yaml",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                path = str(candidate)
+                break
+        else:
+            raise FileNotFoundError("config.yaml not found")
     with open(path) as f:
         return yaml.safe_load(f)
 
@@ -31,13 +44,40 @@ def load_text_file(path: str) -> str:
     return Path(path).read_text(encoding="utf-8")
 
 
+def _resolve_path(path_str: str, config_dir: Path) -> Path:
+    """Resolve a path relative to the config file's directory."""
+    p = Path(path_str)
+    if p.is_absolute():
+        return p
+    resolved = config_dir / p
+    if resolved.exists():
+        return resolved
+    # Fallback to cwd
+    return p
+
+
 def run() -> None:
     logger.info("=== Job Scout starting ===")
 
     config = load_config()
     user_cfg = config["user"]
-    resume = load_text_file(user_cfg["resume_path"])
-    preferences = load_text_file(user_cfg["preferences_path"])
+
+    # Resolve email: support ${GMAIL_ADDRESS} env var syntax
+    email = user_cfg["email"]
+    if email.startswith("${") and email.endswith("}"):
+        env_var = email[2:-1]
+        email = os.environ.get(env_var, email)
+    user_cfg["email"] = email
+
+    # Resolve file paths relative to config.yaml location
+    config_dir = Path("config.yaml").resolve().parent
+    for candidate in [Path(__file__).resolve().parent.parent.parent / "config.yaml"]:
+        if candidate.exists():
+            config_dir = candidate.parent
+            break
+
+    resume = load_text_file(str(_resolve_path(user_cfg["resume_path"], config_dir)))
+    preferences = load_text_file(str(_resolve_path(user_cfg["preferences_path"], config_dir)))
 
     db = Database()
     user_id = db.get_or_create_user(

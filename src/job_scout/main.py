@@ -1,7 +1,39 @@
-"""Main orchestrator for Job Scout."""
+"""
+Main orchestrator for Job Scout.
+
+Operating modes
+---------------
+full (default)
+    The complete job-search pipeline: fetch → deduplicate → pre-filter →
+    AI score → email notification. Requires all secrets (Supabase, Adzuna,
+    Gemini, Gmail). Runs every 2 hours via GitHub Actions (job-scout.yml).
+
+keepalive
+    Lightweight mode whose sole purpose is to prevent the free Supabase
+    project from being paused due to inactivity. Performs a single read
+    query against the database and exits. No LLM/AI APIs are called.
+    Runs every 3 days via GitHub Actions (keepalive.yml).
+
+Selecting a mode
+----------------
+Pass ``--mode keepalive`` on the command line, or set the ``MODE``
+environment variable to ``keepalive``.  Anything else (or omitting the
+flag entirely) runs full mode.
+
+Examples::
+
+    # Full mode (default)
+    python -m job_scout.main
+    python -m job_scout.main --mode full
+
+    # Keepalive mode
+    python -m job_scout.main --mode keepalive
+    MODE=keepalive python -m job_scout.main
+"""
 
 from __future__ import annotations
 
+import argparse
 import logging
 import os
 import sys
@@ -11,6 +43,7 @@ import yaml
 
 from .database import Database
 from .filters import apply_filters
+from .keepalive import run_keepalive
 from .models import SearchConfig, ScoredJob
 from .notifier import send_notification
 from .scoring import Scorer
@@ -149,5 +182,43 @@ def run() -> None:
     logger.info("=== Job Scout finished ===")
 
 
+def _parse_mode() -> str:
+    """
+    Determine the operating mode from CLI args or environment variable.
+
+    Priority: --mode flag > MODE env var > default ("full").
+    Valid values: "full", "keepalive".
+    """
+    parser = argparse.ArgumentParser(
+        description="Job Scout — autonomous job search agent",
+        add_help=True,
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["full", "keepalive"],
+        default=None,
+        help=(
+            "Operating mode. 'full' runs the complete job-search pipeline "
+            "(default). 'keepalive' performs a lightweight Supabase ping to "
+            "prevent the free project from being paused due to inactivity."
+        ),
+    )
+    args, _ = parser.parse_known_args()
+
+    if args.mode:
+        return args.mode
+
+    # Fall back to MODE environment variable
+    env_mode = os.environ.get("MODE", "full").lower()
+    if env_mode not in ("full", "keepalive"):
+        logger.warning("Unknown MODE=%r — defaulting to 'full'", env_mode)
+        return "full"
+    return env_mode
+
+
 if __name__ == "__main__":
-    run()
+    mode = _parse_mode()
+    if mode == "keepalive":
+        run_keepalive()
+    else:
+        run()

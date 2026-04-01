@@ -76,6 +76,38 @@ export GMAIL_APP_PASSWORD=...
 cd src && python -m job_scout.main
 ```
 
+## Operating Modes
+
+Job Scout supports two distinct modes, selected via the `--mode` CLI flag or the `MODE` environment variable.
+
+### Full Mode (default)
+
+Runs the complete job-search pipeline: fetch → deduplicate → pre-filter → AI score → email notification. This is what runs every 2 hours via `job-scout.yml`.
+
+```bash
+# Both are equivalent:
+python -m job_scout.main
+python -m job_scout.main --mode full
+```
+
+Requires all secrets: `SUPABASE_URL`, `SUPABASE_KEY`, `ADZUNA_APP_ID`, `ADZUNA_APP_KEY`, `GEMINI_API_KEY`, `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD`.
+
+### Keepalive Mode
+
+A lightweight mode whose sole purpose is to prevent the free Supabase project from being paused due to inactivity. Supabase pauses free-tier projects after 7 days of no database activity.
+
+This mode performs a single read query against the database and exits immediately. **No LLM/AI APIs are called**, so it has effectively zero AI cost.
+
+Runs every 3 days via `keepalive.yml`.
+
+```bash
+python -m job_scout.main --mode keepalive
+# or:
+MODE=keepalive python -m job_scout.main
+```
+
+Only requires `SUPABASE_URL` and `SUPABASE_KEY`.
+
 ## Project Structure
 
 ```
@@ -84,7 +116,8 @@ cd src && python -m job_scout.main
 ├── preferences.md               # Your job preferences (used by AI scorer)
 ├── requirements.txt
 ├── src/job_scout/
-│   ├── main.py                  # Orchestrator — ties everything together
+│   ├── main.py                  # Orchestrator — mode selection + full pipeline
+│   ├── keepalive.py             # Keepalive mode — lightweight Supabase ping
 │   ├── models.py                # Data classes (Job, ScoredJob, SearchConfig)
 │   ├── database.py              # Supabase client
 │   ├── filters.py               # Rule-based pre-filters
@@ -96,7 +129,8 @@ cd src && python -m job_scout.main
 ├── supabase/migrations/
 │   └── 001_initial_schema.sql   # Database schema
 └── .github/workflows/
-    └── job-scout.yml            # GitHub Actions cron workflow
+    ├── job-scout.yml            # Full mode — runs every 2 hours
+    └── keepalive.yml            # Keepalive mode — runs every 3 days
 ```
 
 ## Adding a New Job Source

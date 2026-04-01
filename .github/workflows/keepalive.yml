@@ -1,0 +1,36 @@
+name: Supabase Keepalive
+
+# Runs every 3 days to prevent the free Supabase project from being paused
+# due to inactivity (Supabase pauses free projects after 7 days of no activity).
+#
+# This workflow performs a single lightweight read query — no LLM/AI APIs are
+# called, so it has effectively zero AI cost.
+#
+# Only SUPABASE_URL and SUPABASE_KEY are required; all other secrets are omitted.
+
+on:
+  schedule:
+    - cron: "0 6 */3 * *"       # Every 3 days at 06:00 UTC
+  workflow_dispatch:              # Allow manual trigger
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ping Supabase (keepalive)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          MODE: keepalive
+          PYTHONPATH: src
+        run: python -m job_scout.main --mode keepalive

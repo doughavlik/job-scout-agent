@@ -1,0 +1,167 @@
+# Job Scout configuration
+# Secrets (API keys, passwords) are read from environment variables, not this file.
+
+user:
+  email: "${GMAIL_ADDRESS}"              # Read from env var at runtime
+  notification_threshold: 70             # Minimum score (1-100) to trigger email
+  resume_path: "master_resume.md"
+  preferences_path: "preferences.md"
+
+searches:
+  # --- Remote searches (nationwide) ---
+  - name: "Customer Success Manager - Remote"
+    keywords: "customer success manager"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Customer Experience Manager - Remote"
+    keywords: "customer experience manager"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Head of Customer Success - Remote"
+    keywords: "head of customer success"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+
+  - name: "CS Operations Manager - Remote"
+    keywords: "customer success operations"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Revenue Operations - Remote"
+    keywords: "revenue operations manager"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Sales Operations - Remote"
+    keywords: "sales operations manager"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Technical CSM - Remote"
+    keywords: "technical customer success manager"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Implementation Manager - Remote"
+    keywords: "implementation manager"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "Forward Deployed Engineer - Remote"
+    keywords: "forward deployed engineer"
+    location: "United States"
+    remote: "remote"
+    radius_km: null
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  # --- Houston, TX (on-site / hybrid) ---
+  - name: "Customer Success - Houston"
+    keywords: "customer success manager"
+    location: "Houston"
+    remote: "onsite"
+    radius_km: 120
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "RevOps / SalesOps - Houston"
+    keywords: "revenue operations OR sales operations"
+    location: "Houston"
+    remote: "onsite"
+    radius_km: 120
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  # --- Austin, TX (on-site / hybrid) ---
+  - name: "Customer Success - Austin"
+    keywords: "customer success manager"
+    location: "Austin"
+    remote: "onsite"
+    radius_km: 120
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "RevOps / SalesOps - Austin"
+    keywords: "revenue operations OR sales operations"
+    location: "Austin"
+    remote: "onsite"
+    radius_km: 120
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  # --- Nashville, TN (on-site / hybrid) ---
+  - name: "Customer Success - Nashville"
+    keywords: "customer success manager"
+    location: "Nashville"
+    remote: "onsite"
+    radius_km: 120
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+  - name: "RevOps / SalesOps - Nashville"
+    keywords: "revenue operations OR sales operations"
+    location: "Nashville"
+    remote: "onsite"
+    radius_km: 120
+    excluded_companies: []
+    excluded_title_keywords:
+      - "intern"
+      - "entry level"
+
+adzuna:
+  country: "us"                          # Adzuna country code
+  results_per_page: 50
+  max_days_old: 1                        # Only jobs posted in the last N days
